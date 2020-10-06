@@ -73,7 +73,7 @@ namespace testGroup
             elements1 = doc.Root.Element("transaction").Element("project").Element("configurations").Element("configuration").Element("components").Elements();
             Record component;
             Dictionary<string, Record> dict;
-            SortedList<string, Record> sList;
+            List<Record> sList;
             SortedDictionary<string, Record> dDocumentation, dAssembly, dParts, dStandard, dOther, dMaterials, dKits, dNone, dictS;
             dDocumentation = new SortedDictionary<string, Record>();
             dAssembly = new SortedDictionary<string, Record>();
@@ -85,8 +85,9 @@ namespace testGroup
             dNone = new SortedDictionary<string, Record>();
             dictS = new SortedDictionary<string, Record>();
 
-            sList =new SortedList<string, Record>();
+            sList =new List<Record>();
             dict = new Dictionary<string, Record>();
+            dictS = new SortedDictionary<string, Record>();
             string key;
             foreach (XElement e1 in elements1)
             {
@@ -115,8 +116,8 @@ namespace testGroup
                     }
                 }
                 key = component.designation + (char)32 + component.title;
-                if (!dict.ContainsKey(key)) { dict.Add(key, component); }
-                else dict[key].quantity++;
+                if (!dictS.ContainsKey(key)) { dictS.Add(key, component); }
+                else dictS[key].quantity++;
             }
             
             //Заполнили словарь *******
@@ -130,7 +131,7 @@ namespace testGroup
             string partition = "Документация";
             int j = 6;
 
-            var dO = dict.GroupBy(g => g.Value.chapter).OrderBy(n => n.Key, new CustomComparer()).ToDictionary(group => group.Key, group => group.ToDictionary(pair => pair.Key, pair => pair.Value));
+            var dO = dictS.GroupBy(g => g.Value.chapter).OrderBy(n => n.Key, new CustomComparer()).ToDictionary(group => group.Key, group => group.ToDictionary(pair => pair.Key, pair => pair.Value));
             //Console.WriteLine(dO.GetType());
             //var d1 = dict.GroupBy(g => g.Value.chapter).ToDictionary(group => group.Key, group => group.ToDictionary(pair => pair.Key, pair => pair.Value));
             //Console.WriteLine(d1.GetType());
@@ -141,12 +142,15 @@ namespace testGroup
             //Console.WriteLine(dO.First().Key);
             //Console.WriteLine(dO.Last().Key);
 
-            foreach (string d in dO.Keys)
+            foreach (var d in dO.Values)
             ////for (int i = 0; i < dO.Count(); i++)
             {
-                Console.WriteLine(d);
+                foreach (var v in d.Values) { sList.Add(v); }
 
             }
+            Console.WriteLine(dictS.Count);
+            Console.WriteLine(sList.Count);
+            foreach (Record r in sList) { Console.WriteLine("{0} {1}",r.designation, r.title); }
             //wb.Close();
             //xlApp.Quit();
             Console.ReadKey();
